@@ -105,6 +105,7 @@ export const abbreviateText = (text: string, length: number): string => {
 	return abbrev + '\u2026'
 }
 
+// TODO Move these to BaseModule
 export const getDescription = (): string => {
 	const $ = document.querySelector
 	const description =
@@ -140,7 +141,6 @@ export const escapeHtml = (unsafe: string): string => {
 		.replace(/'/g, '&#039;')
 }
 
-// TODO Move these to BaseModule
 export const getEmbed = (uri?: string, options?: ISettings): string => {
 	const embed = [
 		`<iframe scrolling="no" frameborder="0" style="border:none;" allowtransparency="true"`,

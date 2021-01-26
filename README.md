@@ -1,15 +1,9 @@
 Social Share Privacy 2
 ======================
 
-Social Share Privacy 2 is a frameworkless rewrite of jQuery plugin SSP that allows
-you to add social share buttons to your website that don't allow social sites to
-track your users. The buttons are first disabled and a user needs to click them
-to enable them. So in order toe.g. like a site on facebook with these social share
-buttons a user needs to click two times. But in return for this extra click a user
-can only be tracked by this third party sites when he decides to enable the buttons.
-Using the settings menu a user can also permanently enable a social share button.
+Social Share Privacy 2 is a frameworkless rewrite of jQuery plugin SSP that allows you to add social share buttons to your website that don't allow social sites to track your users. The buttons are first disabled and a user needs to click them to enable them. So in order toe.g. like a site on facebook with these social share buttons a user needs to click two times. But in return for this extra click a user can only be tracked by this third party sites when he decides to enable the buttons. Using the settings menu a user can also permanently enable a social share button.
 
-TODO: supported services list and README should be verified and updated
+TODO: verify and update supported services list and README
 
 Supported share services:
 
