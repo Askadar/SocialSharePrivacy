@@ -1,13 +1,15 @@
-Social Share Privacy
-====================
+Social Share Privacy 2
+======================
 
-Social Share Privacy is a jQuery plugin that lets you add social share buttons
-to your website that don't allow the social sites to track your users. The buttons
-are first disabled and a user needs to click them to enable them. So in order to
-e.g. like a site on facebook with these social share buttons a user needs to click
-two times. But in return for this extra click a user can only be tracked by this
-third party sites when he decides to enable the buttons. Using the settings menu
-a user can also permanently enable a social share button.
+Social Share Privacy 2 is a frameworkless rewrite of jQuery plugin SSP that allows
+you to add social share buttons to your website that don't allow social sites to
+track your users. The buttons are first disabled and a user needs to click them
+to enable them. So in order toe.g. like a site on facebook with these social share
+buttons a user needs to click two times. But in return for this extra click a user
+can only be tracked by this third party sites when he decides to enable the buttons.
+Using the settings menu a user can also permanently enable a social share button.
+
+TODO: supported services list and README should be verified and updated
 
 Supported share services:
 
@@ -30,16 +32,19 @@ Supported share services:
 
 Note that Tumblr and email are just normal links and thus always enabled.
 
-This is a fork of socialSharePrivacy by Heise. In this fork the service support
-was made extensible, some services where added and some bugs fixed. It has some
-incompatible changes, though (consolidated option names, use of the boolean values
-`true` and `false` instead of the strings `"on"` and `"off"` etc.).
+This is a fork of socialSharePrivacy by panzi, which was a fork of socialSharePrivacy by Heise.
+In this fork library was rewritten to be framework-independent via plugin architecture where
+library provides only base functionality of supporting share services and settings persistance.
+It ships with vanilla HTML and LocalStorage plugins as defaults.
+
+The first fork can be found here:
+[http://panzi.github.io/SocialSharePrivacy/](http://panzi.github.io/SocialSharePrivacy/)
 
 The original can be found here:
 [http://www.heise.de/extras/socialshareprivacy/](http://www.heise.de/extras/socialshareprivacy/)
 
 The Delicious support was heavily inspired by the delicious button jQuery plugin:
-[http://code.google.com/p/delicious-button/](http://code.google.com/p/delicious-button/)  
+[http://code.google.com/p/delicious-button/](http://code.google.com/p/delicious-button/)
 The style for this button was atually copied and only slightly adapted from this plugin.
 
 Overview
@@ -61,18 +66,8 @@ Overview
 <span id="dependencies">Dependencies</span>
 -------------------------------------------
 
- * [jQuery](http://jquery.com/)
- * [jQuery cookies plugin](https://github.com/panzi/jQuery-Cookies) (optional)
- * [uglifyjs](https://npmjs.org/package/uglify-js) (for [build.sh](#buildsh))
- * [uglifycss](https://npmjs.org/package/uglifycss) (for [build.sh](#buildsh))
- * [extend](https://www.npmjs.org/package/extend) (for [build.sh](#buildsh))
-
-The jQuery cookies plugin is needed in order to enable services permanently.
-However, you can plug in your own replacement to store these options differently
-(e.g. via ajax in the user profile or in the browser's local store). For an
-example that stores the perma options in HTML5 local storage instead of cookies
-see the file
-[localstorage.js](https://github.com/panzi/SocialSharePrivacy/blob/master/javascripts/localstorage.js).
+None, but you will need typescript and building packages to transpile library for youserlf.
+Optionaly extra plugins can be used to substitute provided HTMLRender and LocalStorage implementation
 
 <span id="how-to-use">How to use</span>
 ----------------------------------------
@@ -81,7 +76,7 @@ see the file
 <html>
 <head>
 …
-<script type="text/javascript" src="jquery.js"></script> 
+<script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="jquery.socialshareprivacy.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function () {
@@ -118,8 +113,8 @@ However, for your convenience I provide these precompiled versions of the script
  * [jquery.socialshareprivacy.min.ru.js](http://panzi.github.io/SocialSharePrivacy/javascripts/jquery.socialshareprivacy.min.ru.js) <sup>3</sup>
  * [jquery.socialshareprivacy.min.css](http://panzi.github.io/SocialSharePrivacy/stylesheets/jquery.socialshareprivacy.min.css)
 
-1 This file contains all JavaScripts except the `jquery.socialshareprivacy.localstorage.js` module and the translations.  
-2 This file contains the same as 1, but it also automatically initializes elements with the attribute `data-social-share-privacy="true"` set.  
+1 This file contains all JavaScripts except the `jquery.socialshareprivacy.localstorage.js` module and the translations.
+2 This file contains the same as 1, but it also automatically initializes elements with the attribute `data-social-share-privacy="true"` set.
 3 These files contain only translation strings and have to be included in addition to `jquery.socialshareprivacy.min.js`.
 
 You can also asynchronously load the buttons if you use the `jquery.socialshareprivacy.min.autoload.js` script:
@@ -145,7 +140,7 @@ You can also asynchronously load the buttons if you use the `jquery.socialsharep
 	s.type = 'text/javascript';
 	s.async = true;
 	s.src = 'jquery.socialshareprivacy.min.autoload.js';
-	
+
     t.parentNode.insertBefore(s, t);
 })();
 </script>
@@ -1385,7 +1380,7 @@ in your HTML document.
 
 	Usage:
 	 ./build.sh [options]
-	
+
 	Options:
 	 -h              Print this help message.
 	 -m <modules>    Comma separated list of JavaScript modules to pack. Possible values:
@@ -1393,11 +1388,11 @@ in your HTML document.
 	                     gplus, hackernews, linkedin, mail, pinterest, reddit,
 	                     stumbleupon, tumblr, twitter, xing
 	                 default: all
-	
+
 	 -l <languages>  Comma separated list of languages to pack. Possible values:
 	                     all, none, de, es, fr, nl, pl, pt, ru
 	                 default: all
-	
+
 	 -a <enabled>    Autoload. Possible values: on, off (default: on)
 	 -c <enabled>    Pack stylesheets. Possible values: on, off (default: on)
 	 -i <enabled>    Pack images. Possible values: on, off (default: on)
@@ -1427,7 +1422,7 @@ Internet Explorer <= 7 is not supported.
 
 Most of this plugin is licensed under the [MIT license](http://www.opensource.org/licenses/mit-license.php):
 
-Copyright (c) 2012 Mathias Panzenböck  
+Copyright (c) 2012 Mathias Panzenböck
 Copyright (c) 2011 Hilko Holweg, Sebastian Hilbig, Nicolas Heiringhoff,
 Juergen Schmidt, Heise Zeitschriften Verlag GmbH & Co. KG, http://www.heise.de
 
@@ -1451,10 +1446,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The file `stylesheets/jquery.socialshareprivacy.delicious.css` is licensed under
 the Apache License, Version 2.0:
 
-Copyright (c) 2012 Mathias Panzenböck  
+Copyright (c) 2012 Mathias Panzenböck
 Copyright (c) 2010 [Mike @ moretechtips.net]
 
-Licensed under the Apache License, Version 2.0 (the "License");  
+Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
