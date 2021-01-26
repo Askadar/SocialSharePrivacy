@@ -21,7 +21,6 @@ export interface IModule {
 		// txt_on: 'connected to Buffer'
 		display_name: string
 		// display_name: 'Buffer'
-
 	}
 	loadI18N(strings: Record<string, string>): void
 
@@ -36,8 +35,10 @@ export interface IModule {
 	getInfoText(): string
 	getGraphic(): string
 	getAlt(): string
-	getShareUrl(): string
-	getIframeParams() : { width?: number } // TODO extend
+	getIframeSrc(): string
+	getIframeParams(): {
+		[P in keyof HTMLIFrameElement]: HTMLIFrameElement[P]
+	}
 	// text: $.fn.socialSharePrivacy.getTitle
 	// picture: $.fn.socialSharePrivacy.getImage
 }

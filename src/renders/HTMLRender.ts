@@ -9,7 +9,7 @@
 			<div class="info">{info text}</div>
 			<span class="switch {value} -- share-box__switch switch switch--{value}">{ enabled status text }</span>
 			<div class="dummy_btn { network } -- share-box__button share-box__button--dummy{? !enabled}">
-				<img class="privacy_dummy" src="{ graphics.line || graphics.box }">
+				<img class="privacy_dummy -- share-box__network-preview" src="{ graphics.line || graphics.box }">
 			</div>
 		</li>
  * On:
@@ -47,6 +47,20 @@ export class HTMLRender {
 
 		this._root.appendChild($container)
 		return $existingContainer || $container
+	}
+
+	private getEl<HTMLElementType extends HTMLElement>(
+		selector: string,
+		_name: string
+	): HTMLElementType {
+		const $container = this.getContainerEl()
+		const $element = $container?.querySelector<HTMLElementType>(selector)
+
+		if (!$container || !$element) {
+			throw new Error(`Tried to access ${_name} on unmnounted container`)
+		}
+
+		return $element
 	}
 
 	getContainerEl() {
@@ -90,36 +104,59 @@ export class HTMLRender {
 			$switch.innerText = this._module.getSwitchText(forPrivate) || '\u00a0'
 			this.toggleShareButtonContents(!forPrivate)
 		} else {
-			console.warn('Unexpected code reached handling switch click. Toggle state class was not found.')
+			console.warn(
+				'Unexpected code reached handling switch click. Toggle state class was not found.'
+			)
 		}
 	}
 
-	getShareButtonEl(): HTMLDivElement {
-		const $container = this.getContainerEl()
-		const $button = $container?.querySelector<HTMLDivElement>('.share-box__button')
+	getShareButtonEl = this.getEl.bind(this, 'share-box__button', 'share button')
+	createShareButtonEl(isPrivate: boolean): HTMLDivElement {
+		const $button = document.createElement('div')
 
-		if (!$container || !$button) {
-			throw new Error('Tried to access share button on unmnounted container')
+		if (isPrivate) {
+			const $img = document.createElement('img')
+
+			$img.src = this._module.getGraphic()
+			$img.alt = this._module.getAlt()
+			$img.className = 'share-box__network-preview'
+
+			$button.appendChild($img)
+		} else {
+			// <iframe src="{ constructed src }" frameborder="0" { ...iframeParams } />
+			const $iframe = document.createElement('iframe')
+			const extraParams = this._module.getIframeParams()
+
+			// IE <= 9 support
+			// $iframe.allowtransparency="true"
+
+			$iframe.src = this._module.getIframeSrc()
+			if (extraParams) {
+				const entries = Object.entries(extraParams)
+				entries
+					.filter(([key]) => Object.getOwnPropertyDescriptor($iframe, key)?.writable)
+					// TODO decide on final extraParams interface so we don't need to iterate over all potential iframe properties
+					// @ts-ignore: Currently allowed, ignore should be removed after interface is decided
+					.forEach(([key, value]) => (key in $iframe ? ($iframe[key] = value) : null))
+			}
 		}
 
 		return $button
 	}
-	createShareButtonEl(isPrivate: boolean): HTMLDivElement {}
 	toggleShareButtonContents(toPublic: boolean): void {
 		const $container = this.getContainerEl()
 		const $button = this.getShareButtonEl()
 
 		if (toPublic) {
-			const $publicButton = this.createShareButtonEl(false)
+			const $publicButton = this.createShareButtonEl(!toPublic)
 
 			$container?.removeChild($button)
 			$container?.appendChild($publicButton)
 		} else {
-			const $privateButton = this.createShareButtonEl(true)
+			const $privateButton = this.createShareButtonEl(toPublic)
 
 			$container?.removeChild($button)
 			$container?.appendChild($privateButton)
 		}
 	}
-
 }
