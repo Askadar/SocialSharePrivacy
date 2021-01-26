@@ -23,7 +23,7 @@
  * Note regarding sample view:
 		- `{ name }` is a variable hint;
 		- `class="help_info -- share-box"` contains both old and new BEM class markup separated by `--`
-			meant to denote planned class and design update based on extra customization and easier design adaptation
+			meant to denote planned class and design update based on extra customization and easier design adaptation;
  */
 
 import { IModule } from '../modules/_BaseModule'
@@ -31,13 +31,14 @@ import { IModule } from '../modules/_BaseModule'
 export class HTMLRender {
 	private readonly _root: HTMLElement
 	private readonly _module: IModule
+	private _infoTimeout = 500
 
 	constructor(parent: HTMLElement, module: IModule) {
 		this._root = parent
 		this._module = module
 	}
 
-	renderButNotExactlyMaybeChangeNameOrLogic(): HTMLElement {
+	public renderButNotExactlyMaybeChangeNameOrLogic(): HTMLElement {
 		const $existingContainer = this.getContainerEl()
 		if ($existingContainer) {
 			return $existingContainer
@@ -47,6 +48,13 @@ export class HTMLRender {
 
 		this._root.appendChild($container)
 		return $existingContainer || $container
+	}
+	public unmount(): void {
+		this.unbindSwitchHandler()
+		this.unbindContainerHandler()
+
+		const $existingContainer = this.getContainerEl()
+		if ($existingContainer) this._root.removeChild($existingContainer)
 	}
 
 	private getEl<HTMLElementType extends HTMLElement>(
@@ -63,28 +71,87 @@ export class HTMLRender {
 		return $element
 	}
 
-	getContainerEl() {
+	private getContainerEl(): HTMLLIElement | null {
 		return this._root.querySelector<HTMLLIElement>(`.share-box--{this._module.network}`)
 	}
-	createContainerEl() {
+	private _shouldShowInfo: Promise<boolean> | boolean = false
+	private _shouldShowInfoTm?: number
+	private createContainerEl() {
+		// <li class="help_info { network } info_{ enabled } -- share-box share-box--{ network }">
 		const $box = document.createElement('li')
+
+		$box.className = `share-box share-box--${this._module.network}`
+		$box.addEventListener('mouseenter', this.handleContainerMouseenter)
+		$box.addEventListener('mouseleave', this.handleContainerMouseleave)
 
 		const $infobox = this.createInfoboxEl()
 		$box.appendChild($infobox)
 
-		const $switch = this.createSwitchEl()
+		// TODO attach stored privacy initial value
+		const $switch = this.createSpanSwitchEl(true)
 		$box.appendChild($switch)
 
-		const $button = this.createShareButtonEl()
+		// TODO attach stored privacy initial value
+		const $button = this.createShareButtonEl(true)
 		$box.appendChild($button)
 
 		return $box
 	}
+	private handleContainerMouseenter(): void {
+		if (this._shouldShowInfoTm) {
+			return
+		}
 
-	createInfoboxEl() {}
+		this._shouldShowInfoTm = setTimeout(() => {
+			// resolve()
+			this.toggleInfoboxVisibility(true)
+		}, this._infoTimeout)
+	}
+	private handleContainerMouseleave(): void {
+		if (this._shouldShowInfoTm) {
+			this._shouldShowInfoTm = clearTimeout(this._shouldShowInfoTm) as undefined
+		}
+	}
+	private unbindContainerHandler() {
+		const $box = this.getContainerEl()
 
-	createSwitchEl() {}
-	handleSwitchClick(event: MouseEvent): void {
+		$box?.removeEventListener('mouseenter', this.handleContainerMouseenter)
+		$box?.removeEventListener('mouseleave', this.handleContainerMouseleave)
+	}
+
+	private getInfoboxEl = this.getEl.bind(this, 'share-box__info', 'info box')
+	private createInfoboxEl(): HTMLDivElement {
+		// <div class="info -- share-box__info">{info text}</div>
+		const $info = document.createElement('div')
+
+		$info.className = `share-box__info hideable`
+
+		$info.innerText = this._module.getInfoText()
+
+		return $info
+	}
+	private toggleInfoboxVisibility(show: boolean) {
+		if (show) {
+			this.getInfoboxEl().classList.add('hideable--visible')
+		} else {
+			this.getInfoboxEl().classList.remove('hideable--visible')
+		}
+	}
+
+	private getSwitchEl = this.getEl.bind(this, 'share-box__switch', 'privacy switch')
+	// TODO use input#checkbox + label
+	createSpanSwitchEl(isPrivate: boolean): HTMLSpanElement {
+		// <span class="switch switch_{value} -- share-box__switch switch switch--{value}">{ enabled status text }</span>
+		const $switch = document.createElement('span')
+
+		$switch.className = `share-box__switch switch switch--${isPrivate ? 'off' : 'on'}`
+		$switch.innerText = this._module.getSwitchText(isPrivate)
+
+		$switch.addEventListener('click', this.handleSwitchClick)
+
+		return $switch
+	}
+	private handleSwitchClick(event: MouseEvent): void {
 		const $switch = event.currentTarget as HTMLSpanElement
 
 		if ($switch.classList.contains('switch--off')) {
@@ -109,12 +176,16 @@ export class HTMLRender {
 			)
 		}
 	}
+	private unbindSwitchHandler() {
+		this.getSwitchEl().removeEventListener('click', this.handleSwitchClick)
+	}
 
-	getShareButtonEl = this.getEl.bind(this, 'share-box__button', 'share button')
-	createShareButtonEl(isPrivate: boolean): HTMLDivElement {
+	private getShareButtonEl = this.getEl.bind(this, 'share-box__button', 'share button')
+	private createShareButtonEl(isPrivate: boolean): HTMLDivElement {
 		const $button = document.createElement('div')
 
 		if (isPrivate) {
+			// <img class="privacy_dummy -- share-box__network-preview" src="{ graphics.line || graphics.box }">
 			const $img = document.createElement('img')
 
 			$img.src = this._module.getGraphic()
@@ -143,7 +214,7 @@ export class HTMLRender {
 
 		return $button
 	}
-	toggleShareButtonContents(toPublic: boolean): void {
+	private toggleShareButtonContents(toPublic: boolean): void {
 		const $container = this.getContainerEl()
 		const $button = this.getShareButtonEl()
 

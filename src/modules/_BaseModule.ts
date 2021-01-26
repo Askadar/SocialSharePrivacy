@@ -24,7 +24,7 @@ export interface IModule {
 	}
 	loadI18N(strings: Record<string, string>): void
 
-	getSwitchText(enabled: boolean): string
+	getSwitchText(isPrivate: boolean): string
 
 	meta: {
 		// perma_option: true
