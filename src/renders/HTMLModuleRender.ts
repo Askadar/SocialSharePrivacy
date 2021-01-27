@@ -28,7 +28,7 @@
 
 import { IModule } from '../modules/_BaseModule'
 
-export class HTMLRender {
+export class HTMLModuleRender {
 	private readonly _root: HTMLElement
 	private readonly _module: IModule
 	private _infoTimeout = 500
